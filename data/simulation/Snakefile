@@ -1,0 +1,249 @@
+# simulation and benchmarking snakefile
+configfile: "config.yaml"
+
+import itertools
+
+rule all:
+    input:
+        # simulation
+        # expand('ground_truth/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/variant_matrix.csv', ncells=config['ncells'], nmutations=config['nmutations'], n_cov=config['n_cov'],rep=config['reps'],thresh=config['threshold']),
+        # ancestree
+        # expand("ground_truth/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/read_count_matrix.txt",ncells=config['ncells'], nmutations=config['nmutations'], n_cov=config['n_cov'],rep=config['reps'],thresh=config['threshold']),
+        # expand("ancestree/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/ancestree.dot",ncells=config['ncells'], nmutations=config['nmutations'], n_cov=config['n_cov'],rep=config['reps'],thresh=config['threshold']),
+        # paiirtree
+        # expand("pairtree/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/pairtree.npz",ncells=config['ncells'], nmutations=config['nmutations'], n_cov=config['n_cov'], rep=config['reps'],thresh=config['threshold']),
+        # scite
+        # expand("scite/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}_ml0.newick",ncells=config['ncells'], nmutations=config['nmutations'], n_cov=config['n_cov'], rep=config['reps'],thresh=config['threshold']),
+        # merlin
+        # expand("merlin/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}_clone_tree_edge_list.txt",ncells=config['ncells'], nmutations=config['nmutations'], n_cov=config['n_cov'], rep=config['reps'],thresh=config['threshold']),
+        # PhiSCS
+        # expand('phiscs/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/phiscs_input.CFMatrix',ncells=config['ncells'], nmutations=config['nmutations'], n_cov=config['n_cov'], rep=config['reps'],thresh=config['threshold']),
+        # PhiSCS-bnb
+        # expand('phiscs-bnb/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/phiscs_input.CFMatrix',ncells=config['ncells'], nmutations=config['nmutations'], n_cov=config['n_cov'], rep=config['reps'],thresh=config['threshold']),
+        # # lichee
+        # expand('ground_truth/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/lichee_input.txt',ncells=config['ncells'], nmutations=config['nmutations'], n_cov=config['n_cov'], rep=config['reps'],thresh=config['threshold']),
+        # expand('lichee/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/lichee_tree.txt',ncells=config['ncells'], nmutations=config['nmutations'], n_cov=config['n_cov'], rep=config['reps'],thresh=config['threshold']),
+        # calder
+        expand('calder/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/calder_tree1.dot',ncells=config['ncells'], nmutations=config['nmutations'], n_cov=config['n_cov'], rep=config['reps'],thresh=config['threshold']),
+
+rule simulate:
+    params:
+        prefix="ground_truth/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}"
+    output:
+        clonal_matrix="ground_truth/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/clonal_matrix.txt",
+        usage_matrix="ground_truth/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/usage_matrix.txt",
+        variant_matrix="ground_truth/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/variant_matrix.csv",
+        total_matrix='ground_truth/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/total_matrix.csv',
+        obs_freq_matrix='ground_truth/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/obs_frequency_matrix.txt',
+        collapsed_var_matrix='ground_truth/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/collapsed_variant_matrix.txt',
+        collapsed_total_matrix='ground_truth/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/collapsed_total_matrix.txt',
+        tree = 'ground_truth/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/tree.txt',
+        mapping = 'ground_truth/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/mutation_to_clone_mapping.txt',
+    log:
+        std="ground_truth/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/log.log", 
+        err="ground_truth/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/err.log",
+    benchmark: "ground_truth/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/benchmark.benchmark", 
+    shell:
+        "python ../../src/simulation.py --output {params.prefix} "
+        " --mutations {wildcards.nmutations} --cells {wildcards.ncells} --genomes {wildcards.nmutations} " 
+        " --coverage {wildcards.n_cov} -t {wildcards.thresh} > {log.std} 2> {log.err}"
+
+rule prep_ancestree:
+    input:
+        variant_matrix=rules.simulate.output.variant_matrix,
+        total_matrix=rules.simulate.output.total_matrix
+    output:
+        m = "ground_truth/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/read_count_matrix.txt",
+    shell:
+        "python prep_ancestree.py --variant {input.variant_matrix} --total {input.total_matrix} --out {output.m}"
+
+rule ancestree:
+    output:
+        dot="ancestree/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/ancestree.dot"
+    input:
+        rules.prep_ancestree.output.m
+    params:
+        exec=config['ancestree_exec']
+    benchmark: 
+        "ancestree/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/benchmark.benchmark", 
+    log:
+        std='ancestree/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/std.log',
+        err='ancestree/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/err.log',
+    shell:
+        "{params.exec} -d {output.dot} {input} > {log.std} 2> {log.err}"
+
+rule prep_pairtree: 
+    input:
+        variant_matrix=rules.simulate.output.variant_matrix,
+        total_matrix=rules.simulate.output.total_matrix
+    output:
+        ssm = "pairtree/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/pairtree_input.ssm",
+        d = "pairtree/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/params.json"
+    params:
+        pfx = "pairtree/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/"
+    shell:
+        "python prep_pairtree.py --variant {input.variant_matrix} --total {input.total_matrix} --out {params.pfx}"
+
+rule pairtree:
+    input:
+        ssm = rules.prep_pairtree.output.ssm,
+        json = rules.prep_pairtree.output.d,
+    output:
+        npz = "pairtree/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/pairtree.npz"
+    log:
+        std = "pairtree/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/log.txt",
+        err = "pairtree/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/err.log"
+    params:
+        exec=config['pairtree_exec'],
+    benchmark: 
+        "pairtree/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/benchmark.benchmark", 
+    shell:
+        "{params.exec} --params {input.json} {input.ssm} {output.npz} > {log.std} 2> {log.err}"
+
+rule prep_scite:
+    input:
+        var_df = rules.simulate.output.variant_matrix
+    output:
+        matrix = 'ground_truth/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/scite_input.txt'
+    params:
+    shell:
+        'python prep_scite.py -v {input.var_df} -o {output.matrix}'
+
+
+rule scite:
+    output:
+        result='scite/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}_ml0.newick',
+    input:
+        character_matrix=rules.prep_scite.output.matrix,
+    params:
+        prefix='scite/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}',
+        niter=config['scite_niter'],
+        nrestarts=config['scite_nrestarts'],
+        exec=config['scite_exec'],
+        fn=config['estimated_fn'],
+        fp=config['estimated_fp'],
+    benchmark: 
+        'scite/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}.benchmark',
+    log:
+        std='scite/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/scite.log',
+        err='scite/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/scite.err.log',
+    shell:
+        '{params.exec} -i {input.character_matrix} -n {wildcards.nmutations} -m {wildcards.ncells} -o {params.prefix} -a '
+        ' -cc 0 -l {params.niter} -r {params.nrestarts} -fd {params.fp} -ad {params.fn} 0 -max_treelist_size 1 '
+        ' > {log.std} 2> {log.err} '
+
+rule merlin:
+    input:
+        total = rules.simulate.output.total_matrix,
+        variant = rules.simulate.output.variant_matrix
+    output:
+        "merlin/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}_clone_tree_edge_list.txt"
+    params:
+        prefix = "merlin/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}"
+    benchmark:
+        "merlin/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}.benchmark.benchmark"
+    shell:
+        "python ../../src/merlin.py -t {input.total} -v {input.variant} -o {params.prefix}"
+
+rule prep_phiscs:
+    input:
+        csv = rules.simulate.output.variant_matrix,
+        tot = rules.simulate.output.total_matrix
+    output:
+        tsv = "ground_truth/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/phiscs_input.txt"
+    shell:
+        "python prep_phiscs.py -v {input.csv} -t {input.tot} -o {output.tsv}"
+
+rule phiscs:
+    input:
+        tsv = rules.prep_phiscs.output.tsv
+    output:
+        out = "phiscs/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/phiscs_input.CFMatrix"
+    params:
+        exec = config['phiscs_exec'],
+        fn=config['estimated_fn'],
+        fp=config['estimated_fp'],
+        outdir='phiscs/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/'
+    benchmark:
+        'phiscs/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/benchmark.benchmark'
+    shell:
+        "python {params.exec} --SCFile {input.tsv} -time 3600 -fn {params.fn} -fp {params.fp} -o {params.outdir}"
+
+rule phiscs_bnb:
+    input:
+        tsv = rules.prep_phiscs.output.tsv
+    output:
+        "phiscs-bnb/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/phiscs_input.CFMatrix"
+    benchmark:
+        "phiscs-bnb/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}.benchmark.benchmark"
+    params:
+        exec=config['phiscs_bnb_exec'],
+        outdir='phiscs-bnb/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/'
+    shell:
+        "python {params.exec} -i {input.tsv} -o {params.outdir}"
+
+# rule phylowgs:
+#     input:
+#     output:
+#     params:
+#         exec=config['python2_exec']
+#     shell:
+#         "{params.exec} "
+
+rule prep_lichee:
+    input:
+        var = rules.simulate.output.variant_matrix,
+        tot = rules.simulate.output.total_matrix
+    output:
+        tsv = "ground_truth/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/lichee_input.txt"
+    shell:
+        "python prep_lichee.py -v {input.var} -t {input.tot} -o {output.tsv}"
+
+rule lichee:
+    input:
+        rules.prep_lichee.output.tsv
+    output:
+        tree = 'lichee/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/lichee_tree.txt'
+    params:
+        exec=config['lichee_exec'],
+        dot='lichee/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/lichee_tree.dot'
+    benchmark:
+        "lichee/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}.benchmark.benchmark"
+    conda:
+        "java8.yaml"
+    log:
+        std='lichee/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/std.log',
+        err='lichee/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/err.log',
+    shell:
+        "java -jar {params.exec} -build -i {input} -o {output.tree} "
+        " -maxVAFAbsent 0.0 -minVAFPresent 0.005 -maxVAFValid 1 -minClusterSize 1 -n 0"
+        " -dotFile {params.dot} > {log.std} 2> {log.err}"
+
+rule prep_calder:
+    input:
+        variant_matrix=rules.simulate.output.variant_matrix,
+        total_matrix=rules.simulate.output.total_matrix
+    output:
+        m = "ground_truth/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/calder_input.txt",
+    shell:
+        "python prep_calder.py --variant {input.variant_matrix} --total {input.total_matrix} --out {output.m}"
+
+
+rule calder:
+    input:
+        rules.prep_calder.output
+    output:
+        tree = 'calder/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/calder_tree1.dot'
+    params:
+        exec=config['calder_exec'],
+        g_dir=config['gurobi_dir'],
+        outdir="calder/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}",
+    benchmark:
+        "calder/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}.benchmark.benchmark"
+    log:
+        std='calder/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/std.log',
+        err='calder/n{ncells}_m{nmutations}_g{nmutations}_c{n_cov}_t{thresh}_rep{rep}/err.log',
+    shell:
+        "LD_LIBRARY_PATH={params.g_dir}/lib "
+        " java -jar {params.exec} -i {input} -o {params.outdir} > {log.std} 2> {log.err}"
+
