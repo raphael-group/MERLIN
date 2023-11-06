@@ -1,0 +1,60 @@
+# simulation parameters
+ncells:
+    - 50
+    - 100
+    - 500
+    # - 1000
+# partition the cells into m groups
+
+nmutations:
+    - 5
+    - 10
+    - 15
+
+n_cov:
+    - 50
+
+threshold:
+    - 0.01
+    - 0.05
+
+reps: # can try to use LRU
+    # - 1 # beta binomial 1027
+    # - 2
+    # - 3
+    # - 4
+    # - 5
+    - 6   # should be binomial 1027
+    - 7
+    - 8 
+    - 9 
+    - 10
+    # - 11 # not binomial stuff 1023
+    # - 12
+    # - 13
+    # - 14
+    # - 15
+    # - 16   
+    # - 17
+    # - 18 
+    # - 19 
+    # - 20 # testing whether scite input is correct
+fp: 0.001
+fn: 0.001
+
+estimated_fp: 0.066
+estimated_fn: 0.016
+
+scite_nrestarts: 1
+scite_niter: 1000000
+
+gurobi_dir: "/n/fs/ragr-data/users/viola/gurobi1003/linux64/"
+phiscs_exec: '/n/fs/ragr-data/users/palash/PhISCS/PhISCS-B'
+phiscs_bnb_exec: '/n/fs/ragr-data/users/viola/PhISCS-BnB/main.py'
+scite_exec: '/n/fs/ragr-data/users/palash/SCITE/scite'
+pairtree_exec: "/n/fs/ragr-data/users/palash/pairtree/bin/pairtree"
+ancestree_exec: "/n/fs/ragr-data/users/palash/AncesTree/build/ancestree"
+python2_exec: '/n/fs/ragr-data/users/palash/anaconda3/envs/scarlet/bin/python2'
+lichee_exec: "/n/fs/ragr-data/users/viola/lichee/LICHeE/release/lichee.jar"
+calder_exec: "/n/fs/ragr-data/users/viola/calder/calder.jar"
+data_path: "/n/fs/ragr-data/users/palash/phyloMito/data/simulation"
