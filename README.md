@@ -6,7 +6,7 @@ Overview of the MERLIN (Mitocondrial EvolutionaRy Lineage INference) algorithm
   1. [Pre-requisites](#pre-requisites)
   2. [Usage instcructions](#usage)
      * [I/O formats](#io)
-     * [ConDoR](#condor)
+     * [MERLIN](#merlin)
 
 <a name="pre-requisites"></a>
 ## Pre-requisites
