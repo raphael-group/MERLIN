@@ -1,0 +1,8 @@
+#src/simulation.py -n 50 -m 5 -g 5 -c 50 -o data/example
+# GMT Tue Nov  7 19:41:09 2023
+# 
+5 1 2 3
+1
+2 4
+3
+4

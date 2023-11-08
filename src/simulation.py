@@ -202,9 +202,15 @@ def main():
     parser.add_argument('-c', '--coverage', type=float, required=True, help='Expected sequencing coverage.')
     parser.add_argument('-o', '--output', type=str, required=True, help='Output prefix.')
     parser.add_argument('-t', '--threshold', type=float, required=False, help="minimum allele frequency allowed",default=0.05)
+    # parser.add_argument('-h', required=False, action='store_true')
     args = parser.parse_args()
-    # np.random.seed(int(datetime.now().timestamp()))
-    seed = 40+int(args.output.split("rep")[-1])
+   
+    # help_message = '''usage:
+    # '''
+    ending = (args.output.split("rep")[-1])
+    if ending.isnumeric():
+        seed = 40 + int(ending)
+    else: seed = 42
     np.random.seed(seed)
     
     assert args.mutations >= args.genomes, 'Number of mutations must be greater than or equal to number of genomes.'
@@ -255,4 +261,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
 
