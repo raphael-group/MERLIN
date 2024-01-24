@@ -1,0 +1,18 @@
+#../../src/simulation.py --output ground_truth/n500_m15_g15_c50_t0.05_rep11 --mutations 15 --cells 500 --genomes 15 --coverage 50 -t 0.05
+# GMT Tue Oct 24 18:38:43 2023
+# 
+0 1 2
+1 5 4
+2 8
+5 3 7 14
+8
+3 6 9
+4 10
+6 12
+7
+9 11
+12
+14
+10 13
+11
+13
