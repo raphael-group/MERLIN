@@ -29,7 +29,17 @@ It is important that the format matches the example input files `total_matrix.cs
 mkdir data/example/
 python src/simulation.py -n 50 -m 5 -g 5 -c 50 -o data/example/
 ```
+### Simulation usage
+    usage: simulation.py -m n_mutation -n n_cells -g n_clones -c coverage [-t threshold] -o O 
 
+    optional arguments:
+      -m, --help      show this help message and exit
+      -n, --total     csv file with total read count matrix
+      -g, --variant   csv file with variant read count matrix
+      -c, --coverage  expected sequencing coverage for simulated data
+      -t, --threshold minimum variant allele frequency (default 0.05)
+      -o, --out       output directory
+      
 #### Simulation Output
 - `variant matrix.txt` / `total_matrix.txt` : input to MERLIN
 - `tree.txt` : groundtruth clone tree
