@@ -6,7 +6,7 @@ Overview of the MERLIN (Mitocondrial EvolutionaRy Lineage INference) algorithm
   1. [Pre-requisites](#pre-requisites)
   2. [Usage instcructions](#usage)
      * [Simulation](#io)
-     * [MERLIN](#merlin)
+     * [MERLIN](#merlin_main)
 
 <a name="pre-requisites"></a>
 ## Pre-requisites
@@ -48,8 +48,8 @@ python src/simulation.py -n 50 -m 5 -g 5 -c 50 -o data/example/
 - `cell_to_clone_mapping.txt`
 - `mutation_to_clone_mapping.txt`
 
-<a name="merlin"></a>
-### MERLIN
+<a name="merlin_main"></a>
+### MERLIN script
 
     usage: merlin.py [-h] [-t T] [-v V] -o O 
 
