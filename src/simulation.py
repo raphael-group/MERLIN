@@ -4,6 +4,7 @@ import pandas as pd
 import networkx as nx
 from datetime import datetime
 import random
+import os
 
 from scipy.stats import poisson, binom, betabinom
 
@@ -242,8 +243,10 @@ def main():
     total_matrix.index = cell_names
     variant_matrix.columns = mut_names
     total_matrix.columns = mut_names
-    np.savetxt(f'{args.output}/clonal_matrix.txt', clonal_matrix, fmt='%d')
-    np.savetxt(f'{args.output}/usage_matrix.txt', usage_matrix, fmt='%.4f')
+    if not os.path.exists(args.output):
+        os.makedirs(args.output)
+    np.savetxt(f'{args.output}/clonal_matrix.txt', clonal_matrix.T, fmt='%d')
+    np.savetxt(f'{args.output}/usage_matrix.txt', usage_matrix.T, fmt='%.4f')
     
     variant_matrix.to_csv(f'{args.output}/variant_matrix.csv')
     total_matrix.to_csv(f'{args.output}/total_matrix.csv')
