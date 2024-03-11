@@ -30,14 +30,12 @@ mkdir data/example/
 python src/simulation.py -n 50 -m 5 -g 5 -c 50 -o data/example/
 ```
 
-#### Output
-MERLIN produces the below files as output:
-- The inferred clone tree $S$, as `{output_prefix}_clone_tree_edge_list.txt`
-- The $U$-matrix from the factorization $F=UB$, as `{output_prefix}_Umatrix.csv`
-- The binarized $U$-matrix as `{output_prefix}_Amatrix.csv`
-- The ancestral graph $G$ inferred from frequency matrix $F$ as `{output_prefix}_ancestry_edge_list.txt`
-
-An example output for the example input above can be found in `data/example`
+#### Simulation Output
+- `variant matrix.txt` / `total_matrix.txt` : input to MERLIN
+- `tree.txt` : groundtruth clone tree
+- `cell_tree.txt` : groundtruth cell lineage tree
+- `cell_to_clone_mapping.txt`
+- `mutation_to_clone_mapping.txt`
 
 <a name="merlin"></a>
 ### MERLIN
@@ -54,5 +52,13 @@ An example of usage is as follows.
 
     $ python src/merlin.py -t data/example/total_matrix.csv -v data/example/variant_matrix.csv -o data/example/
 
+### Output
+MERLIN produces the below files as output:
+- The inferred clone tree $S$, as `{output_prefix}_clone_tree_edge_list.txt`
+- The $U$-matrix from the factorization $F=UB$, as `{output_prefix}_Umatrix.csv`
+- The binarized $U$-matrix as `{output_prefix}_Amatrix.csv`
+- The ancestral graph $G$ inferred from frequency matrix $F$ as `{output_prefix}_ancestry_edge_list.txt`
+
+An example output for the example input above can be found in `data/example`
 
 
