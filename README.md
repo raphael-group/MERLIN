@@ -1,5 +1,8 @@
 # MERLIN
-Overview of the MERLIN (Mitocondrial EvolutionaRy Lineage INference) algorithm 
+Overview of the MERLIN (Mitocondrial EvolutionaRy Lineage INference) algorithm
+
+paper: https://academic.oup.com/bioinformatics/article/40/Supplement_1/i218/7700844
+
 
 ## Contents
 
