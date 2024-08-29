@@ -16,7 +16,7 @@ paper: https://academic.oup.com/bioinformatics/article/40/Supplement_1/i218/7700
 + python3 (>=3.6)
 + [numpy](https://numpy.org/doc/)
 + [pandas](https://pandas.pydata.org/pandas-docs/stable/index.html)
-+ [gurobipy](https://www.gurobi.com/documentation/9.0/quickstart_mac/py_python_interface.html)
++ [gurobipy](https://www.gurobi.com/documentation/9.0/quickstart_mac/py_python_interface.html) (academic license required, which can be obtained [here](https://www.gurobi.com/features/academic-named-user-license/) with educational account.)
 + [networkx](https://networkx.org/)
 + (optional for generating simulation instances and benchmarking) [snakemake (>=5.2.0)](https://snakemake.readthedocs.io)
 

@@ -73,6 +73,7 @@ def get_ancestry_clustered_data(df_variant, df_total, read_threshold = 25, vaf_t
         vaf1[np.isnan(vaf1)] = 0
         vaf2[np.isnan(vaf2)] = 0
         
+        if np.dot(vaf1,vaf1) == 0: continue
         slope = np.dot(vaf1, vaf2) / np.dot(vaf1, vaf1)
 
         #print(mut1, mut2, slope)
@@ -237,15 +238,23 @@ def set_ILP_formuation(G_ancestry, cell2group, df_cluster_variant, df_cluster_to
             if val > 0.5:
                 out.write(f'{ancestry_edge_list[edge_idx][0]}, {ancestry_edge_list[edge_idx][1]}\n')
 
-    df_a = pd.DataFrame(np.reshape(model.getAttr('x', a).values(), (ngroups, nmutations)).astype(int),
-                        columns=df_cluster_total.index, index=df_cluster_total.columns)
-    df_a.to_csv(f'{prefix}_Amatrix.csv')
-    df_u = pd.DataFrame(np.reshape(model.getAttr('x', u).values(), (ncells, nmutations)),
-                        columns=df_cluster_total.index,index=df_cluster_total.columns)
-    df_u.to_csv(f'{prefix}_Umatrix.csv')
-    with open(f'{prefix}_ancestry_edge_list.txt', 'w') as out:
-        for edge in G_ancestry.edges:
-            out.write(f"{edge[0]}, {edge[1]}\n")
+    a_values = np.array(list(model.getAttr('x', a).values()))
+    if len(a_values) == ngroups * nmutations:
+        df_a = pd.DataFrame(np.reshape(a_values, (ngroups, nmutations)).astype(int),
+                            columns=df_cluster_total.index, index=df_cluster_total.columns)
+        df_a.to_csv(f'{prefix}_Amatrix.csv')
+    else:
+        raise Exception(f'Error reshaping array: cannot reshape array of size {len(a_values)} into shape ({ngroups},{nmutations})')
+
+    u_values = np.array(list(model.getAttr('x', u).values()))
+
+    if len(u_values) == ncells * nmutations:
+        df_u = pd.DataFrame(np.reshape(u_values, (ncells, nmutations)),
+                            columns=df_cluster_total.index, index=df_cluster_total.columns)
+        df_u.to_csv(f'{prefix}_Umatrix.csv')
+        
+    else:
+        raise Exception(f'Error reshaping array: cannot reshape array of size {len(u_values)} into shape ({ncells},{nmutations})')
     
   
 def main():
@@ -258,8 +267,8 @@ def main():
     parser.add_argument('--cell_groups',type=str,required=False, help='clustering of cells, ')
     args = parser.parse_args()
 
-    df_variant = pd.read_csv(args.variant, header=0, index_col = 0).T.astype(int)
-    df_total = pd.read_csv(args.total, header=0, index_col = 0).T.astype(int)
+    df_variant = pd.read_csv(args.variant, header=0, index_col = 0).astype(int)
+    df_total = pd.read_csv(args.total, header=0, index_col = 0).astype(int)
 
     G_ancestry = get_ancestry_clustered_data(df_variant, df_total)
     
