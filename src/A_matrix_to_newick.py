@@ -11,18 +11,20 @@ def is_perfect_phylogeny(matrix):
     return True
 
 def build_newick(matrix, mutations):
-    print(matrix.shape)
     if matrix.shape[0] == 1:
         return matrix.index[0]
     if matrix.empty or not mutations:
-        return ",".join(matrix.index)
+        short =  ",".join(matrix.index)
+        return short
     for mutation in mutations:
         positive_branch = matrix[matrix[mutation] == 1]
         negative_branch = matrix[matrix[mutation] == 0]
-        print(len(positive_branch), len(negative_branch))
         if len(positive_branch) > 0 and len(negative_branch) > 0:
             break
-    print("after split",len(positive_branch), len(negative_branch))
+    if len(positive_branch) == 0:
+        return build_newick(negative_branch, mutations[1:])
+    if len(negative_branch) == 0:
+        return build_newick(positive_branch, mutations[1:])
     positive_tree = build_newick(positive_branch, mutations[1:])
     negative_tree = build_newick(negative_branch, mutations[1:])
     return f"({positive_tree},{negative_tree})"
